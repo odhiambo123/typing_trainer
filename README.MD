@@ -1,7 +1,3 @@
-To convert your setup into a professional **README.md** that looks great on GitHub, copy and paste the block below.
-
-I have structured this to highlight your **Kubernetes** and **Docker** skills specifically for recruiters.
-
 ---
 
 ```markdown
