@@ -1,0 +1,168 @@
+:root {
+    --bg-color: #0d1117;
+    --terminal-bg: #161b22;
+    --text-main: #c9d1d9;
+    --accent-green: #238636;
+    --error-red: #da3633;
+    --font-mono: 'SFMono-Regular', Consolas, monospace;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font-family: var(--font-mono);
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Main Container */
+#terminal-container {
+    background: var(--terminal-bg);
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    width: 900px; /* Slightly wider to accommodate keyboard */
+    overflow: hidden;
+}
+
+.terminal-header { 
+    background: #21262d; 
+    padding: 12px; 
+    display: flex; 
+    align-items: center; 
+}
+
+.dot { height: 12px; width: 12px; border-radius: 50%; margin-right: 8px; }
+.red { background: #ff5f56; } .yellow { background: #ffbd2e; } .green { background: #27c93f; }
+
+/* Text Display Area */
+#text-display { 
+    padding: 60px 40px; 
+    font-size: 1.6rem; 
+    min-height: 100px;
+    line-height: 1.5;
+    text-align: center;
+}
+
+.current { border-bottom: 2px solid var(--accent-green); }
+.correct { color: var(--accent-green); }
+.incorrect { color: var(--error-red); background: rgba(218, 54, 51, 0.1); }
+
+/* Virtual Keyboard Section */
+#virtual-keyboard {
+    padding: 30px 20px 10px 20px !important; /* Reduced bottom padding */
+    background: #161b22;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.keyboard-row { 
+    display: flex !important;           /* Absolute requirement for horizontal */
+    flex-direction: row !important;      /* Forces left-to-right */
+    justify-content: center !important;  /* Centers the keys */
+    align-items: center !important;
+    margin-bottom: 10px !important; 
+    width: 100% !important;
+    clear: both !important;              /* Prevents float interference */
+}
+
+.key {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 45px !important;
+    height: 45px !important;
+    margin: 0 4px !important;
+    background: #0d1117 !important;
+    border: 1px solid #21262d !important;
+    opacity: 0.8;
+    color: #8b949e !important;
+    flex-shrink: 0 !important;           /* Prevents keys from squishing */
+}
+
+/* Enhanced "Neon" Hint Key */
+.hint-key {
+    background-color: var(--accent-green) !important;
+    color: #ffffff !important;
+    border-color: #00ff41 !important; /* Matrix green */
+    box-shadow: 0 0 20px #94edaa, 0 0 40px #00ff41; /* Double glow */
+    transform: translateY(-5px) scale(1.1);
+    z-index: 10;
+    animation: pulse-glow 1.5s infinite;
+}
+
+@keyframes pulse-glow {
+    0% { box-shadow: 0 0 15px #00ff41; }
+    50% { box-shadow: 0 0 35px #00ff41; }
+    100% { box-shadow: 0 0 15px #00ff41; }
+}
+
+#key-space {
+    width: 300px;
+}
+
+/* Stats Footer */
+.stats-footer { 
+    display: flex; 
+    background: #0d1117; 
+    padding: 15px 30px; 
+    border-top: 1px solid #30363d; 
+}
+
+.stat-box { margin-right: 40px; }
+.stat-box label { display: block; font-size: 0.7rem; color: #8b949e; margin-bottom: 4px; }
+.stat-box span { font-size: 1.2rem; font-weight: bold; }
+
+/* Hidden Input and Controls */
+#input-field { opacity: 0; position: absolute; pointer-events: none; z-index: -1; }
+.controls { text-align: center; margin-top: 20px; }
+.btn { 
+    background: var(--accent-green); 
+    color: white; 
+    border: none; 
+    padding: 12px 24px; 
+    border-radius: 6px; 
+    cursor: pointer;
+    font-family: var(--font-mono);
+}
+
+#leaderboard-section {
+    background: #0d1117;
+    padding: 15px 30px;
+    border-top: 1px solid #30363d; /* Creates a clear visual split */
+    margin-top: 10px;
+}
+
+.leaderboard-header {
+    color: var(--accent-green);
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+#leaderboard-table {
+    margin-bottom: 10px;
+}
+
+#leaderboard-table th {
+    text-align: left;
+    color: #8b949e;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #30363d;
+}
+
+#leaderboard-table td {
+    padding: 8px 0;
+    color: #c9d1d9;
+}
+
+/* Highlight the top rank */
+#leaderboard-body tr:first-child td {
+    color: #00ff41;
+    text-shadow: 0 0 5px rgba(0, 255, 65, 0.5);
+}

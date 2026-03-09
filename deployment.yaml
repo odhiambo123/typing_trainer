@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: typing-tutor-deploy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: typing-tutor
+  template:
+    metadata:
+      labels:
+        app: typing-tutor
+    spec:
+      containers:
+      - name: web-server
+        image: your-docker-id/typing-tutor:v1
+        ports:
+        - containerPort: 80
