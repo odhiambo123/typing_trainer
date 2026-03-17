@@ -9,7 +9,7 @@ let charIndex = 0;
 let startTime = null;
 let errors = 0;
 let totalTyped = 0;
-let timeLeft = 60;
+let timeLeft = 360;
 let timerInterval = null;
 let isTyping = false;
 
