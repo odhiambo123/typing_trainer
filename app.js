@@ -9,7 +9,7 @@ let charIndex = 0;
 let startTime = null;
 let errors = 0;
 let totalTyped = 0;
-let timeLeft = 360;
+let timeLeft = 3600;
 let timerInterval = null;
 let isTyping = false;
 
@@ -135,7 +135,7 @@ function loadNew() {
     startTime = null; 
     errors = 0; 
     totalTyped = 0; 
-    timeLeft = 360; 
+    timeLeft = 3600; 
     isTyping = false;
     clearInterval(timerInterval);
     if (timerDisplay) timerDisplay.innerText = timeLeft;
