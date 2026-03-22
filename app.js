@@ -1,6 +1,6 @@
 /**
- * Odhis Typing Lab v3.2.1 (STABLE + HINTS)
- * Status: RECOVERED - Fixed keyboard highlighting
+ * Odhis Typing Lab v3.3 (MULTI-MODE + HINTS)
+ * Status: STABLE - Supports K8s and Regular practice modes.
  */
 
 let practiceLibrary = [];
@@ -9,7 +9,7 @@ let charIndex = 0;
 let startTime = null;
 let errors = 0;
 let totalTyped = 0;
-let timeLeft = 3600;
+let timeLeft = 3600; // Adjusted to your preferred hour-long session
 let timerInterval = null;
 let isTyping = false;
 
@@ -22,30 +22,52 @@ const nextBtn = document.getElementById('next-btn');
 const timerDisplay = document.getElementById('timer');
 
 /**
- * 1. INITIALIZATION
+ * 1. INITIALIZATION & MODE SWITCHING
  */
-async function init() {
-        const selector = document.getElementById('mode-selector');
-        //listen to changes in the dropdown and update practiceLibrary accordingly
-        selector.addEventListener('change', () => {
-            init(); // Re-initialize on mode change
-        });
+
+// 1a. The "Worker" - Handles fetching data from the selected JSON
+async function loadData() {
+    const selector = document.getElementById('mode-selector');
+    const targetFile = selector ? selector.value : 'practice_data.json';
+
     try {
-        const targetFile = selector.value;
-        const response = await fetch(targetFile);       
+        const response = await fetch(targetFile);
+        if (!response.ok) throw new Error(`Could not find ${targetFile}`);
+        
         const data = await response.json();
-        practiceLibrary = data.sentences; 
+        
+        // Supports both "sentences" key and flat array formats
+        practiceLibrary = data.sentences || data; 
+        
         renderHighScore();
         loadNew();
         inputField.focus();
-        document.addEventListener('click', () => inputField.focus());
     } catch (e) { 
         display.innerHTML = `<span style="color:red">SYSTEM_HALT: ${e.message}</span>`;
+        console.error("Load Error:", e);
     }
 }
 
+// 1b. The "Manager" - Sets up listeners once
+function init() {
+    const selector = document.getElementById('mode-selector');
+
+    if (selector) {
+        // Use onchange to ensure only one listener exists
+        selector.onchange = () => {
+            loadData();
+        };
+    }
+
+    // Global click listener to keep focus on the terminal
+    document.addEventListener('click', () => inputField.focus());
+
+    // Run initial data load
+    loadData();
+}
+
 /**
- * 2. KEYBOARD HINT LOGIC (THE RECOVERY)
+ * 2. KEYBOARD HINT LOGIC
  */
 function getIDFromChar(char) {
     if (char === " " || char === undefined) return "key-space";
@@ -56,10 +78,8 @@ function getIDFromChar(char) {
 }
 
 function updateKeyboardVisuals() {
-    // Clear all previous highlights
     document.querySelectorAll('.key').forEach(k => k.classList.remove('hint-key'));
     
-    // Highlight the NEXT character we need to type
     const nextChar = currentTarget[charIndex];
     const keyId = getIDFromChar(nextChar);
     const keyElement = document.getElementById(keyId);
@@ -89,11 +109,11 @@ function finishTest() {
     isTyping = false;
     inputField.disabled = true;
     saveScore();
-    alert("TIME EXPIRED!");
+    alert("SESSION_COMPLETE: Time Expired.");
 }
 
 /**
- * 4. TYPING LOGIC (WITH HINT UPDATES)
+ * 4. TYPING LOGIC
  */
 inputField.addEventListener('input', (e) => {
     if (!isTyping && e.target.value.length > 0) {
@@ -115,7 +135,7 @@ inputField.addEventListener('input', (e) => {
     }
 
     updateMetrics();
-    updateKeyboardVisuals(); // Triggers highlight update on every keypress
+    updateKeyboardVisuals();
 
     if (typed === currentTarget) {
         saveScore();
@@ -130,7 +150,8 @@ function updateMetrics() {
     if (!startTime) return;
     const mins = (new Date() - startTime) / 60000;
     if (mins > 0.01) {
-        wpmDisplay.innerText = Math.round((totalTyped / 5) / mins);
+        const wpm = Math.round((totalTyped / 5) / mins);
+        wpmDisplay.innerText = wpm;
     }
     const accuracy = totalTyped > 0 ? Math.round(((totalTyped - errors) / totalTyped) * 100) : 100;
     accDisplay.innerText = `${Math.max(0, accuracy)}%`;
@@ -141,19 +162,23 @@ function loadNew() {
     startTime = null; 
     errors = 0; 
     totalTyped = 0; 
-    timeLeft = 3600; 
     isTyping = false;
     clearInterval(timerInterval);
+    
+    // Reset timer to your preferred session length (3600 for 1 hour)
+    timeLeft = 3600; 
     if (timerDisplay) timerDisplay.innerText = timeLeft;
+    
     inputField.value = "";
     inputField.disabled = false;
     
-    currentTarget = practiceLibrary[Math.floor(Math.random() * practiceLibrary.length)];
-    display.innerHTML = currentTarget.split('').map((c, i) => 
-        `<span class="${i === 0 ? 'current' : ''}">${c}</span>`
-    ).join('');
-
-    updateKeyboardVisuals(); // Initial highlight for the first letter
+    if (practiceLibrary.length > 0) {
+        currentTarget = practiceLibrary[Math.floor(Math.random() * practiceLibrary.length)];
+        display.innerHTML = currentTarget.split('').map((c, i) => 
+            `<span class="${i === 0 ? 'current' : ''}">${c}</span>`
+        ).join('');
+        updateKeyboardVisuals();
+    }
 }
 
 /**
@@ -163,8 +188,14 @@ function saveScore() {
     const currentWPM = parseInt(wpmDisplay.innerText) || 0;
     const currentAcc = accDisplay.innerText;
     if (currentWPM === 0) return;
+
     let leaderboard = JSON.parse(localStorage.getItem('odhis_leaderboard')) || [];
-    leaderboard.push({wpm: currentWPM, accuracy: currentAcc, date: new Date().toLocaleDateString()});
+    leaderboard.push({
+        wpm: currentWPM, 
+        accuracy: currentAcc, 
+        date: new Date().toLocaleDateString()
+    });
+    
     leaderboard.sort((a, b) => b.wpm - a.wpm);
     leaderboard = leaderboard.slice(0, 5);
     localStorage.setItem('odhis_leaderboard', JSON.stringify(leaderboard));
@@ -182,6 +213,7 @@ function renderHighScore() {
     }
 }
 
+// Button Hooks
 nextBtn.onclick = loadNew;
 document.getElementById('reset-btn').onclick = () => {
     if(confirm("SYSTEM_WARNING: Wipe all leaderboard data?")) {
@@ -190,4 +222,5 @@ document.getElementById('reset-btn').onclick = () => {
     }
 };
 
+// Launch
 init();
