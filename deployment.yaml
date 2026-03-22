@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: web-server
-        image: your-docker-id/typing-tutor:v1
+        image: your-docker-id/typing-lab:latest
         ports:
         - containerPort: 80

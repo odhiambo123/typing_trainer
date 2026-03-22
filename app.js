@@ -25,8 +25,14 @@ const timerDisplay = document.getElementById('timer');
  * 1. INITIALIZATION
  */
 async function init() {
+        const selector = document.getElementById('mode-selector');
+        //listen to changes in the dropdown and update practiceLibrary accordingly
+        selector.addEventListener('change', () => {
+            init(); // Re-initialize on mode change
+        });
     try {
-        const response = await fetch('practice_data.json');
+        const targetFile = selector.value;
+        const response = await fetch(targetFile);       
         const data = await response.json();
         practiceLibrary = data.sentences; 
         renderHighScore();
