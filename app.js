@@ -135,7 +135,7 @@ function loadNew() {
     startTime = null; 
     errors = 0; 
     totalTyped = 0; 
-    timeLeft = 60; 
+    timeLeft = 360; 
     isTyping = false;
     clearInterval(timerInterval);
     if (timerDisplay) timerDisplay.innerText = timeLeft;
