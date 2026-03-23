@@ -36,11 +36,23 @@ async function loadData() {
         
         const data = await response.json();
         
-        // Supports both "sentences" key and flat array formats
-        practiceLibrary = data.sentences || data; 
+        // UNIVERSAL MAPPER:
+        // 1. If the file has a "sentences" key (like your K8s files)
+        // 2. If the file is a direct array
+        // 3. If the file uses "regular" or "k8s" as keys (like your generate_data2.py)
+        if (data.sentences) {
+            practiceLibrary = data.sentences;
+        } else if (Array.isArray(data)) {
+            practiceLibrary = data;
+        } else if (data.regular && targetFile.includes('regular')) {
+            practiceLibrary = data.regular;
+        } else if (data.k8s && (targetFile.includes('k8s') || targetFile.includes('data'))) {
+            practiceLibrary = data.k8s;
+        }
+
+        console.log("Library loaded from " + targetFile + ":", practiceLibrary.length, "items");
         
-        renderHighScore();
-        loadNew();
+        loadNew(); // This forces the screen to refresh with the new data
         inputField.focus();
     } catch (e) { 
         display.innerHTML = `<span style="color:red">SYSTEM_HALT: ${e.message}</span>`;
